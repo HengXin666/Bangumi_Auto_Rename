@@ -1,3 +1,38 @@
+## Fork 改进 (自用!!!!!)
+
+> [TIP]
+> 因为我使用的绿联Nas, 因此需要一种Docker的部署方案, 而主版本并不支持`.yaml`部署.
+>
+> 因此我是通过一个`python 3.11`的docker镜像来进行部署的
+>
+> 但是, 奇怪的是, 它的docker分卷好像有问题qwq...
+>
+> 因此我需要改一下代码qwq...
+
+1. 下载`python 3.11`的docker镜像
+
+2. 部署, 挂载:
+  - `docker/Bangumi_Auto_Rename-web`:`/Bangumi_Auto_Rename-web/Bangumi_Auto_Rename-web`
+  - `qb下载路径`:`/Bangumi_Auto_Rename-web/v1`
+  - `视频路径`:`/Bangumi_Auto_Rename-web/v2`
+
+3. 一键安装
+```sh
+echo "deb https://mirrors.aliyun.com/debian/ bullseye main non-free contrib" > /etc/apt/sources.list
+
+apt-get update && apt-get install -y git && apt-get install -y python-is-python3
+
+git clone https://github.com/HengXin666/Bangumi_Auto_Rename.git
+
+pip install --upgrade pip 
+
+apt-get install -y libnss3 libnspr4 libdbus-1-3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libatspi2.0-0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libxkbcommon0 libasound2 libpango-1.0-0 libcairo2
+
+pip install -r requirements_docker.txt -i https://mirrors.aliyun.com/pypi/simple/
+
+python -m src.start
+```
+
 ## 简介
 
 - 😣受不了动漫剧集的命名与Emby自动刮削格式不兼容？
