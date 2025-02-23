@@ -88,15 +88,6 @@ class local_file_picker(ui.dialog):
             # On macOS, we can list mount points in '/Volumes'
             drives = [
                 drive
-                for drive in os.listdir('/Bangumi_Auto_Rename')
-                if os.path.isdir(os.path.join('/Bangumi_Auto_Rename', drive))
-            ]
-            self.drives_toggle = RedToogle(
-                drives, value=drives[0], on_change=self.update_drive
-            )
-        else: # docker
-            drives = [
-                drive
                 for drive in os.listdir('/Volumes')
                 if os.path.isdir(os.path.join('/Volumes', drive))
             ]
@@ -104,8 +95,6 @@ class local_file_picker(ui.dialog):
                 drives, value=drives[0], on_change=self.update_drive
             )
 
-        if (True):
-            pass
         elif platform.system() == 'Linux':
             import os
 
