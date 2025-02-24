@@ -33,6 +33,11 @@ pip install -r requirements_docker.txt -i https://mirrors.aliyun.com/pypi/simple
 python -m src.start
 ```
 
+4. 运行脚本, 添加启动项
+```sh
+bash ./run.sh
+```
+
 ## 简介
 
 - 😣受不了动漫剧集的命名与Emby自动刮削格式不兼容？
