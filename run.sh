@@ -1,57 +1,43 @@
 #!/bin/bash
 
-# 获取当前脚本所在目录
 WORK_DIR=$(pwd)
-
 echo "📌 当前工作目录: $WORK_DIR"
 
-# 1. 创建 start.sh
-echo "📌 生成 start.sh 文件..."
+# 1. 生成 start.sh
+echo "📌 生成 start.sh..."
 cat <<EOF > "$WORK_DIR/start.sh"
 #!/bin/bash
 cd "$WORK_DIR"
 python -m src.start
 EOF
-
-# 赋予 start.sh 执行权限
 chmod +x "$WORK_DIR/start.sh"
-echo "✅ start.sh 创建完成，并赋予执行权限！"
+echo "✅ start.sh 创建完成！"
 
-# 2. 创建 systemd 服务文件
-SERVICE_NAME="bangumi_autorename"
-SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
+# 2. 配置 crontab
+echo "📌 配置 crontab 开机自启..."
+(crontab -l 2>/dev/null; echo "@reboot /bin/bash $WORK_DIR/start.sh") | crontab -
+echo "✅ crontab 配置完成！"
 
-echo "📌 生成 systemd 服务文件: $SERVICE_FILE..."
-cat <<EOF | sudo tee "$SERVICE_FILE" > /dev/null
-[Unit]
-Description=Bangumi Auto Rename Service
-After=network.target
-
-[Service]
-Type=simple
-ExecStart=/bin/bash $WORK_DIR/start.sh
-WorkingDirectory=$WORK_DIR
-Restart=always
-User=root
-
-[Install]
-WantedBy=multi-user.target
+# 3. 安装并配置 supervisord（可选）
+echo "📌 安装 supervisord..."
+apt update && apt install -y supervisor
+mkdir -p /etc/supervisor/conf.d
+cat <<EOF | tee /etc/supervisor/conf.d/bangumi_autorename.conf > /dev/null
+[program:bangumi_autorename]
+command=/bin/bash $WORK_DIR/start.sh
+autostart=true
+autorestart=true
+stderr_logfile=/var/log/bangumi_autorename.err.log
+stdout_logfile=/var/log/bangumi_autorename.out.log
 EOF
+echo "✅ supervisor 配置完成！"
 
-echo "✅ systemd 服务文件创建完成！"
+# 4. 启动 supervisord
+echo "📌 启动 supervisord..."
+supervisord -c /etc/supervisor/supervisord.conf
+supervisorctl reread
+supervisorctl update
+supervisorctl start bangumi_autorename
+echo "✅ 进程守护已启动！"
 
-# 3. 重新加载 systemd 并启用服务
-echo "📌 重新加载 systemd..."
-sudo systemctl daemon-reload
-
-echo "📌 启用 ${SERVICE_NAME} 开机自启..."
-sudo systemctl enable "$SERVICE_NAME"
-
-echo "📌 启动 ${SERVICE_NAME} 服务..."
-sudo systemctl start "$SERVICE_NAME"
-
-# 4. 检查服务状态
-echo "📌 检查 ${SERVICE_NAME} 运行状态..."
-sudo systemctl status "$SERVICE_NAME" --no-pager
-
-echo "🎉 配置完成！系统重启后，Bangumi Auto Rename 将自动启动！"
+echo "🎉 配置完成！重启后 Bangumi Auto Rename 将自动运行！"
