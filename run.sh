@@ -10,7 +10,7 @@ echo "📌 生成 start.sh 文件..."
 cat <<EOF > "$WORK_DIR/start.sh"
 #!/bin/bash
 cd "$WORK_DIR"
-python -m "$WORK_DIR/src.start"
+python -m src.start
 EOF
 
 # 赋予 start.sh 执行权限
